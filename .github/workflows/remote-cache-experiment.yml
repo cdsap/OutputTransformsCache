@@ -57,7 +57,7 @@ jobs:
         rm -rf ~/.gradle/caches/*/$cache
         rm -rf ~/.gradle/caches/$cache-* # Also remove the transforms for Gradle 8.7
 
-        # Always remove the local build cache, since we are testing connection with remote build cache
+        # Always remove the local build cache since we are testing connection with remote build cache
         rm -rf ~/.gradle/caches/build-cache-1
 
         echo "Running build again with --${buildCache}"
