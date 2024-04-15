@@ -5,24 +5,25 @@ on:
   push:
 
 jobs:
-#   remote-cache-prime:
-#     runs-on: ubuntu-latest
-#     steps:
-#         - uses: actions/checkout@v4
-#         - uses: actions/setup-java@v4
-#           with:
-#             distribution: 'temurin'
-#             java-version: '17'
-#         - uses: gradle/actions/setup-gradle@v3
-#           with:
-#             cache-disabled: true
-#         - name: Run build to populate remote cache
-#           run: |
-#             ./gradlew --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true help
-#           env:
-#             DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+  remote-cache-prime:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-java@v4
+          with:
+            distribution: 'temurin'
+            java-version: '17'
+        - uses: gradle/actions/setup-gradle@v3
+          with:
+            cache-disabled: true
+        - name: Run build to populate remote cache
+          run: |
+            ./gradlew --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true help
+          env:
+            DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
   remote-cache-experiment:
+    needs: remote-cache-prime
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,7 +47,7 @@ jobs:
         echo "Test caches/*/$cache removal with --$buildCache"
 
         echo "Running build once to fully populate Gradle User Home"
-        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true help
+        ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true :app:assembleProdDebug
         killall -9 java
 
         echo "Removing $cache from $homeDir/caches"
@@ -57,6 +58,6 @@ jobs:
         rm -rf ~/.gradle/caches/build-cache-1
 
         echo "Running build again with --${buildCache}"
-        ./gradlew --$buildCache -Dscan.tag.remote-cache-experiment-$cache-$buildCache --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false help
+        ./gradlew --$buildCache -Dscan.tag.remote-cache-experiment-$cache-$buildCache --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false :app:assembleProdDebug
       env:
         DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
