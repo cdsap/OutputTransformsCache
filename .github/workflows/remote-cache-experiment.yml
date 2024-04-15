@@ -18,7 +18,7 @@ jobs:
             cache-disabled: true
         - name: Run build to populate remote cache
           run: |
-            ./gradlew --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true help
+            ./gradlew --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true :app:assembleProdDebug
           env:
             DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
