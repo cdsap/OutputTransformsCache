@@ -15,7 +15,8 @@ jobs:
             java-version: '17'
         - uses: gradle/actions/setup-gradle@v3
           with:
-            cache-read-only: false
+            cache-disabled: true
+            # cache-read-only: false
             gradle-home-cache-excludes: |
                 caches/build-cache-1
         - name: Run build to populate remote cache
