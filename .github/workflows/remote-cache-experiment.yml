@@ -49,6 +49,9 @@ jobs:
         echo "Running build once to fully populate Gradle User Home"
         ./gradlew -Dscan.tag.remote-cache-experiment-init --no-daemon --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true :app:assembleProdDebug
         killall -9 java
+        mkdir cache1
+        cp -r ~/.gradle/caches/transforms-4/* cache1/
+
 
         echo "Removing $cache from $homeDir/caches"
         rm -rf ~/.gradle/caches/*/$cache
@@ -59,5 +62,14 @@ jobs:
 
         echo "Running build again with --${buildCache}"
         ./gradlew --$buildCache -Dscan.tag.remote-cache-experiment-$cache-$buildCache --no-configuration-cache -Ddevelocity.deprecation.muteWarnings=true -Dscan.uploadInBackground=false :app:assembleProdDebug
+        mkdir cache2
+        cp -r ~/.gradle/caches/transforms-4/* cache2/
+      - name: Upload test reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: |
+            cache1/*
+            cache2/*
       env:
         DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
